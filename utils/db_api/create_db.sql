@@ -1,18 +1,29 @@
 create table category
 (
-    codename        varchar(255) primary key,
-    name            varchar(255),
-    aliases         text
+    codename varchar(255) primary key,
+    name     varchar(255),
+    aliases  text
 );
 
 create table expense
 (
-    id                integer primary key,
+    expense_id        integer primary key,
+    owner   integer,
     amount            integer,
     created           datetime,
     category_codename integer,
     raw_text          text,
     FOREIGN KEY (category_codename) REFERENCES category (codename)
+    foreign key (owner) REFERENCES user (telegram_id)
+);
+
+create table user
+(
+    user_id     integer primary key,
+    telegram_id integer NOT NULL,
+    name        varchar(255),
+    fk_expenses integer,
+    foreign key (fk_expenses) REFERENCES expense (expense_id)
 );
 
 insert into category (codename, name, aliases)
@@ -22,8 +33,9 @@ values ("products", "продукти", "їда, продукти"),
        ("transport", "громадський транспорт", "метро, автобус,тролейбус, трамвай, фонікулер"),
        ("taxi", "таксі", "таксі"),
        ("phone", "телефон", "телефон, звязок, рахунок, київстар, водафон, лайф, 4g"),
-       ("utilities", "комунальні послуги", "комуналка, комунальні послуги, світло, рахунки, газ, вода, хородна вода, гаряча вода, тепло, опалення, домофон, квартплата"),
+       ("utilities", "комунальні послуги",
+        "комуналка, комунальні послуги, світло, рахунки, газ, вода, хородна вода, гаряча вода, тепло, опалення, домофон, квартплата"),
        ("pets", "домашні тварини", "собака, домашні тварини, корм, ветеренарка, вет клініка, кіт"),
-       ("other", "інше","");
+       ("other", "інше", "");
 
 

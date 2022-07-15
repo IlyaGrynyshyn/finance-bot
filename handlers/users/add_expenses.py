@@ -18,7 +18,7 @@ async def add_expense(message: types.Message):
     :return: message.answer
     """
     try:
-        expense = add_expenses(message.text)
+        expense = add_expenses(message.text, message.from_user.id)
     except error_handler.NotCorrectMassage as e:
         await message.answer(str(e))
         return
@@ -30,21 +30,24 @@ async def add_expense(message: types.Message):
 class Expense(NamedTuple):
     """Структура добавленного в БД нового расхода"""
     id: Optional[int]
+    owner: int
     amount: int
     category_name: str
 
 
-def add_expenses(raw_message: str):
+def add_expenses(raw_message: str, owner: int):
     """
     Додавання витрати до дази даних
+    :param owner:
+    :param user_id:
     :param raw_message:
     :return: Expense
     """
     parsed_message = _parce_message(raw_message)
     categories = parsed_message[1]
     category = Categories().get_categories(categories)
-    inserted_row_id = db.add_expense(parsed_message[0], _get_now_formatted(), str(category), raw_message)
-    return Expense(id=None, amount=parsed_message[0], category_name=category)
+    inserted_row_id = db.add_expense(owner=owner, amount=parsed_message[0], created=_get_now_formatted(), category_codename=str(category),raw_test=raw_message)
+    return Expense(id=None, owner=owner, amount=parsed_message[0], category_name=category)
 
 
 def _parce_message(message: str):

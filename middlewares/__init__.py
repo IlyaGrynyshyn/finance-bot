@@ -8,4 +8,4 @@ from .user_access import AccessMiddleware
 
 if __name__ == "middlewares":
     dp.middleware.setup(ThrottlingMiddleware())
-    dp.middleware.setup(AccessMiddleware(config.USER_ACCESS))
+    # dp.middleware.setup(AccessMiddleware(config.USER_ACCESS))

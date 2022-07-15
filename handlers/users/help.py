@@ -6,8 +6,13 @@ from loader import dp
 
 @dp.message_handler(CommandHelp())
 async def bot_help(message: types.Message):
-    text = ("Список команд: ",
-            "/start - Начать диалог",
-            "/help - Получить справку")
-    
-    await message.answer("\n".join(text))
+    text = (
+        "Щоб додати нову витрарту, відправ мені повідомлення в форматані  - сума призначення. \nНаприклад: 500 "
+        "продукти\n "
+        "Мої команди: \n"
+        "1. /today - виводить всі ваші витрати за поточний день\n"
+        "2. /month - виводить всі ваші витрати за місяць\n"
+        "3. /expenses - виводить останні 10 витрат\n"
+        "4. /export - передаю Exel файл з витратами")
+
+    await message.answer(text)

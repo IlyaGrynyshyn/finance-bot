@@ -48,11 +48,23 @@ class DataBase:
                 """
         return self.execute(sql, fetchall=True)
 
-    def add_expense(self, amount: int, created, category_codename: str, raw_test: str):
-        sql = """
-        INSERT INTO expense(amount, created, category_codename, raw_text ) VALUES (?, ?, ?, ? )
+    def add_user(self, user_id: int):
+        sql = f"""
+        INSERT INTO user(telegram_id) values ({user_id})     
         """
-        parameters = (amount, created, category_codename, raw_test)
+        return self.execute(sql, commit=True)
+
+    def check_user(self, user_id: int):
+        sql = f"""
+       SELECT telegram_id FROM user WHERE telegram_id = {user_id}
+        """
+        return self.execute(sql, fetchone=True)
+
+    def add_expense(self, owner: str, amount: int, created, category_codename: str, raw_test: str):
+        sql = """
+        INSERT INTO expense(owner, amount, created, category_codename, raw_text ) VALUES (?, ?, ?, ?, ? )
+        """
+        parameters = (owner, amount, created, category_codename, raw_test)
         self.execute(sql, parameters=parameters, commit=True)
 
     def delete(self, table: str, row_id: int) -> None:
@@ -60,17 +72,17 @@ class DataBase:
         sql = f"DELETE FROM {table} WHERE id={row_id}"
         return self.execute(sql, commit=True)
 
-    def last_expenses(self):
-        sql = """
-        SELECT id, amount, category_codename FROM expense ORDER BY created DESC LIMIT 10
+    def last_expenses(self, user_id: str):
+        sql = f"""
+        SELECT expense_id,owner, amount, category_codename FROM expense WHERE owner = {user_id} ORDER BY created DESC LIMIT 10
         """
         return self.execute(sql, fetchall=True)
 
-    def get_month_statistic(self):
+    def get_month_statistic(self, user_id: str):
         now = _get_now_datetime()
         first_day_of_month = f"{now.year}-{now.month:02}-01"
         sql = f"""
-        SELECT sum(amount) FROM expense where date(created) >= {first_day_of_month}
+        SELECT sum(amount) FROM expense where owner = {user_id} and date(created) >= {first_day_of_month}
         """
         result = self.execute(sql, fetchone=True)
         if not result[0]:
@@ -78,12 +90,23 @@ class DataBase:
         all_month_expenses = result[0]
         return (f'Витрати в цьому місяці - {all_month_expenses} грн')
 
-    def get_today_statistic(self):
+    def get_today_statistic(self, user_id: str):
         sql = f"""
-        SELECT SUM(amount) FROM expense WHERE date(created)=date('now', 'localtime')
+        SELECT SUM(amount) FROM expense WHERE owner = {user_id} and date(created)=date('now', 'localtime')
         """
         result = self.execute(sql, fetchone=True)
         if not result[0]:
             return 'Сьогодні ще не має витрат'
         all_today_expenses = result[0]
         return f'Сьогодні ви витратили - {all_today_expenses} грн'
+
+    def export_to_csv(self, user_id):
+        import pandas as pd
+
+        sql = f"""
+        SELECT amount, created, category_codename, raw_text FROM expense WHERE owner = {user_id} 
+        """
+        df = pd.read_sql(sql, self.connection)
+        path = f'csv_expenses/{user_id}_expenses.csv'
+        df.to_csv(path, index=False)
+        return path
