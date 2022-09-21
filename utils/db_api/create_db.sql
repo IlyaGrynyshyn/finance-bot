@@ -13,7 +13,7 @@ create table expense
     created           datetime,
     category_codename integer,
     raw_text          text,
-    FOREIGN KEY (category_codename) REFERENCES category (codename)
+    FOREIGN KEY (category_codename) REFERENCES category (codename),
     foreign key (owner) REFERENCES user (telegram_id)
 );
 
