@@ -6,4 +6,3 @@ from . import today_statistics
 from . import month_statistics
 from . import delete_expenses
 from . import add_expenses
-
