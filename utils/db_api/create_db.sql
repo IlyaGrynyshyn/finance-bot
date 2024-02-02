@@ -10,11 +10,21 @@ create table expense
     expense_id        integer primary key,
     owner   integer,
     amount            integer,
-    created           datetime,
+    created           DATE,
     category_codename integer,
     raw_text          text,
     FOREIGN KEY (category_codename) REFERENCES category (codename),
     foreign key (owner) REFERENCES user (telegram_id)
+);
+
+create table profit
+(
+    profit_id integer primary key ,
+    owner integer,
+    amount integer,
+    created DATE,
+    row_text text,
+    foreign key (owner) REFERENCES user(telegram_id)
 );
 
 create table user
