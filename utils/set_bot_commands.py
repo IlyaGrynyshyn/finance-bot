@@ -11,8 +11,8 @@ async def set_default_commands(dp):
         [
             types.BotCommand("start", "Запустити бота"),
             types.BotCommand("help", "Вивести справку"),
-            types.BotCommand('expenses', 'Останні витрати'),
-            types.BotCommand('today', 'Останні витрати за поточний день'),
-            types.BotCommand('month', 'Виводить всі трати за поточний місяць'),
+            types.BotCommand("expenses", "Останні витрати"),
+            types.BotCommand("today", "Останні витрати за поточний день"),
+            types.BotCommand("month", "Виводить всі трати за поточний місяць"),
         ]
     )

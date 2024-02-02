@@ -3,7 +3,7 @@ import sqlite3
 
 
 class DataBase:
-    def __init__(self, path_to_db='finance_bot.db'):
+    def __init__(self, path_to_db="finance_bot.db"):
         self.path_to_db = path_to_db
 
     @property
@@ -13,7 +13,14 @@ class DataBase:
     def cursor(self):
         return self.connection.cursor()
 
-    def execute(self, sql: str, parameters: tuple = None, fetchone=False, fetchall=False, commit=False):
+    def execute(
+        self,
+        sql: str,
+        parameters: tuple = None,
+        fetchone=False,
+        fetchall=False,
+        commit=False,
+    ):
         if not parameters:
             parameters = tuple()
         connection = self.connection
@@ -37,8 +44,10 @@ class DataBase:
         self.connection.commit()
 
     def check_db(self):
-        if self.execute("SELECT name FROM sqlite_master "
-                        "WHERE type='table' AND name='expense'", fetchall=True):
+        if self.execute(
+            "SELECT name FROM sqlite_master " "WHERE type='table' AND name='expense'",
+            fetchall=True,
+        ):
             return
         self._init_db()
 
@@ -60,11 +69,20 @@ class DataBase:
         """
         return self.execute(sql, fetchone=True)
 
-    def add_expense(self, owner: str, amount: int, created, category_codename: str, raw_test: str):
+    def add_expense(
+        self, owner: str, amount: int, created, category_codename: str, raw_text: str
+    ):
         sql = """
         INSERT INTO expense(owner, amount, created, category_codename, raw_text ) VALUES (?, ?, ?, ?, ? )
         """
-        parameters = (owner, amount, created, category_codename, raw_test)
+        parameters = (owner, amount, created, category_codename, raw_text)
+        self.execute(sql, parameters=parameters, commit=True)
+
+    def add_profit(self, owner: str, amount: int, created, row_text: str):
+        sql = """
+        INSERT INTO profit(owner,amount, created,row_text) VALUES (?,?,?,?)
+        """
+        parameters = (owner, amount, created, row_text)
         self.execute(sql, parameters=parameters, commit=True)
 
     def delete(self, table: str, row_id: int) -> None:
@@ -81,14 +99,17 @@ class DataBase:
     def get_month_statistic(self, user_id: str):
         now = _get_now_datetime()
         first_day_of_month = f"{now.year}-{now.month:02}-01"
+        print(first_day_of_month)
         sql = f"""
-        SELECT sum(amount) FROM expense where owner = {user_id} and date(created) >= {first_day_of_month}
+        SELECT sum(amount) FROM expense where owner = {user_id} and date(created) >= date({first_day_of_month});
         """
+        f""""""
+
         result = self.execute(sql, fetchone=True)
         if not result[0]:
             return "В цьому місяці не має витрат"
         all_month_expenses = result[0]
-        return (f'Витрати в цьому місяці - {all_month_expenses} грн')
+        return f"Витрати в цьому місяці - {all_month_expenses} грн"
 
     def get_today_statistic(self, user_id: str):
         sql = f"""
@@ -96,9 +117,9 @@ class DataBase:
         """
         result = self.execute(sql, fetchone=True)
         if not result[0]:
-            return 'Сьогодні ще не має витрат'
+            return "Сьогодні ще не має витрат"
         all_today_expenses = result[0]
-        return f'Сьогодні ви витратили - {all_today_expenses} грн'
+        return f"Сьогодні ви витратили - {all_today_expenses} грн"
 
     def export_to_csv(self, user_id):
         import pandas as pd
@@ -107,6 +128,6 @@ class DataBase:
         SELECT amount, created, category_codename, raw_text FROM expense WHERE owner = {user_id} 
         """
         df = pd.read_sql(sql, self.connection)
-        path = f'csv_expenses/{user_id}_expenses.csv'
+        path = f"csv_expenses/{user_id}_expenses.csv"
         df.to_csv(path, index=False)
         return path

@@ -4,7 +4,7 @@ db = DataBase()
 
 
 def test():
-    print('База даних успіщно створена')
+    print("База даних успіщно створена")
     ab = db.check_user(159673949)
     if ab:
         print(ab)

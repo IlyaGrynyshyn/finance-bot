@@ -6,6 +6,7 @@ class Category(NamedTuple):
     """
     Структура категорії
     """
+
     codename: str
     name: str
     aliases: List[str]
@@ -16,11 +17,11 @@ class Categories:
         self._categories = db.select_all_categories()
 
     def get_all_categories(self) -> List[Category]:
-        """ Повертає всі категорії """
+        """Повертає всі категорії"""
         return self._categories
 
     def get_categories(self, category_name: str) -> Category:
-        """ Повертає категорію по дному з її aliases"""
+        """Повертає категорію по дному з її aliases"""
         finded = None
         other_category = None
         for category in self._categories:

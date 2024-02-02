@@ -13,6 +13,7 @@ async def bot_help(message: types.Message):
         "1. /today - виводить всі ваші витрати за поточний день\n"
         "2. /month - виводить всі ваші витрати за місяць\n"
         "3. /expenses - виводить останні 10 витрат\n"
-        "4. /export - передаю Exel файл з витратами")
+        "4. /export - передаю Exel файл з витратами\n"
+    )
 
     await message.answer(text)

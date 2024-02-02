@@ -22,13 +22,13 @@ async def add_expense(message: types.Message):
     except error_handler.NotCorrectMassage as e:
         await message.answer(str(e))
         return
-    answer_message = (
-        f"Додана трана {expense.amount} грн на {expense.category_name}")
+    answer_message = f"Додана трана {expense.amount} грн на {expense.category_name}"
     await message.answer(answer_message)
 
 
 class Expense(NamedTuple):
     """Структура добавленного в БД нового расхода"""
+
     id: Optional[int]
     owner: int
     amount: int
@@ -46,8 +46,16 @@ def add_expenses(raw_message: str, owner: int):
     parsed_message = _parce_message(raw_message)
     categories = parsed_message[1]
     category = Categories().get_categories(categories)
-    inserted_row_id = db.add_expense(owner=owner, amount=parsed_message[0], created=_get_now_formatted(), category_codename=str(category),raw_test=raw_message)
-    return Expense(id=None, owner=owner, amount=parsed_message[0], category_name=category)
+    inserted_row_id = db.add_expense(
+        owner=owner,
+        amount=parsed_message[0],
+        created=_get_now_formatted(),
+        category_codename=str(category),
+        raw_text=raw_message,
+    )
+    return Expense(
+        id=None, owner=owner, amount=parsed_message[0], category_name=category
+    )
 
 
 def _parce_message(message: str):
@@ -56,8 +64,13 @@ def _parce_message(message: str):
     :param message:
     :return: total, category
     """
-    parce_result = re.match(r'([\d ]+) (.*)', message)
-    if not parce_result or not parce_result.group(0) or not parce_result.group(1) or not parce_result.group(2):
+    parce_result = re.match(r"([\d ]+) (.*)", message)
+    if (
+        not parce_result
+        or not parce_result.group(0)
+        or not parce_result.group(1)
+        or not parce_result.group(2)
+    ):
         raise NotCorrectMassage(
             "Не можу зрозуміти ваше повідомлення. Спробуйте ще раз, використовуючи формат, наприклад:\n "
             "50 кава "
